@@ -1,0 +1,10 @@
+# Allow members of the 'input' group to access /dev/uinput.
+# Required for ydotool (Wayland text injection) to work without root.
+#
+# Setup:
+#   sudo cp packaging/udev/60-whisperlinux-uinput.rules /etc/udev/rules.d/
+#   sudo udevadm control --reload-rules && sudo udevadm trigger
+#   sudo usermod -aG input $USER
+#   # Log out and back in for the group change to take effect.
+
+KERNEL=="uinput", GROUP="input", MODE="0660"

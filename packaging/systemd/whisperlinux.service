@@ -1,0 +1,17 @@
+[Unit]
+Description=WhisperLinux voice dictation daemon
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+# Update this path to point to the whisperlinux binary inside your venv:
+ExecStart=%h/Downloads/Projects/whisperlinux/backend/.venv/bin/whisperlinux
+Restart=on-failure
+RestartSec=3
+Environment=DISPLAY=:0
+# Pass through the runtime dir so the socket trigger lands in the right place.
+Environment=XDG_RUNTIME_DIR=/run/user/%U
+
+[Install]
+WantedBy=graphical-session.target
