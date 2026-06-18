@@ -32,7 +32,7 @@ ModelSize = Literal["tiny", "base", "small", "medium", "large"]
 
 
 class Settings(BaseModel):
-    hotkey: str = "<ctrl>+<alt>+space"
+    hotkey: str = "<ctrl>+<alt>+<space>"
     mic_device: str | None = None
     stt_model: ModelSize = "base"
     stt_device: Literal["auto", "cpu", "cuda"] = "auto"
