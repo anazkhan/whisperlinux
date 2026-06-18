@@ -235,3 +235,5 @@ whisperlinux/
   unreliable.
 - Multi-language UI and STT language auto-switching.
 - Optional packaged Flatpak for sandboxed distribution.
+
+
