@@ -7,8 +7,6 @@ from __future__ import annotations
 
 import asyncio
 import logging
-import threading
-import webbrowser
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -69,39 +67,7 @@ def create_app() -> FastAPI:
 app = create_app()
 
 
-def _run_tray() -> None:
-    try:
-        import pystray
-        from PIL import Image, ImageDraw
-
-        def _icon_image(color: str = "green") -> Image.Image:
-            img = Image.new("RGB", (64, 64), color=(30, 30, 30))
-            draw = ImageDraw.Draw(img)
-            draw.ellipse([16, 16, 48, 48], fill=color)
-            return img
-
-        def open_ui(icon, item) -> None:  # noqa: ANN001
-            webbrowser.open(f"http://{HOST}:{PORT}")
-
-        def quit_app(icon, item) -> None:  # noqa: ANN001
-            icon.stop()
-            import os, signal
-            os.kill(os.getpid(), signal.SIGTERM)
-
-        menu = pystray.Menu(
-            pystray.MenuItem("Open settings", open_ui, default=True),
-            pystray.MenuItem("Quit", quit_app),
-        )
-        icon = pystray.Icon("whisperlinux", _icon_image(), "WhisperLinux", menu)
-        icon.run()
-    except Exception as exc:
-        logger.warning("Tray icon unavailable: %s", exc)
-
-
 def run() -> None:
-    tray_thread = threading.Thread(target=_run_tray, daemon=True)
-    tray_thread.start()
-
     logger.info("WhisperLinux running at http://%s:%d", HOST, PORT)
     uvicorn.run(app, host=HOST, port=PORT, log_level="warning")
 
