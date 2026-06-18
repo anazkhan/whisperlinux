@@ -39,9 +39,10 @@ async def lifespan(app: FastAPI):  # type: ignore[type-arg]
     # Register the global hotkey trigger.
     settings = load_settings()
     trigger = get_trigger(settings.hotkey)
+    loop = asyncio.get_running_loop()
 
     def on_toggle() -> None:
-        asyncio.run_coroutine_threadsafe(pipeline.toggle(), asyncio.get_event_loop())
+        asyncio.run_coroutine_threadsafe(pipeline.toggle(), loop)
 
     trigger.start(on_toggle)
     logger.info("Hotkey trigger started")
