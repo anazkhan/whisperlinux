@@ -32,16 +32,19 @@ export function useStatus() {
         const res = await fetch("/api/status");
         const data = await res.json() as { state: string };
         setEvent(prev => {
-          // Always sync recording ↔ non-recording transitions so the button is correct.
-          // For in-progress states (transcribing/cleaning_up/injecting), let WebSocket
-          // handle the detail; polling just ensures we never get stuck on "recording".
+          const next = data.state as StatusEvent["state"];
           const prevIsRecording = prev.state === "recording";
-          const nowIsRecording = data.state === "recording";
-          if (prevIsRecording !== nowIsRecording) {
-            return { ...prev, state: data.state as StatusEvent["state"] };
+          const nextIsRecording = next === "recording";
+          // Always sync recording ↔ non-recording (button must appear/disappear).
+          if (prevIsRecording !== nextIsRecording) return { ...prev, state: next };
+          // Unstick from processing states when backend is idle/done.
+          if (["transcribing", "cleaning_up", "injecting"].includes(prev.state) &&
+              (next === "idle" || next === "done")) {
+            return { ...prev, state: next };
           }
+          // Terminal states: always sync.
           if (prev.state === "idle" || prev.state === "done" || prev.state === "error") {
-            return { ...prev, state: data.state as StatusEvent["state"] };
+            return { ...prev, state: next };
           }
           return prev;
         });
