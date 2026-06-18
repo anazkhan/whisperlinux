@@ -76,6 +76,14 @@ def clear_history() -> None:
     history.clear()
 
 
+@router.get("/status")
+def get_status() -> dict:
+    from app.pipeline import _pipeline
+    if _pipeline is None or not _pipeline._recording:
+        return {"state": "idle"}
+    return {"state": "recording"}
+
+
 @router.post("/dictate/start", status_code=202)
 async def dictate_start() -> dict:
     await get_pipeline().start()

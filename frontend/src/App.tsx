@@ -12,7 +12,7 @@ export function App() {
   const status = useStatus();
 
   const isRecording = status.state === "recording";
-  const isBusy = ["recording", "transcribing", "cleaning_up", "injecting"].includes(status.state);
+  const isBusy = ["transcribing", "cleaning_up", "injecting"].includes(status.state);
 
   return (
     <div style={shell}>
@@ -21,16 +21,28 @@ export function App() {
           <span style={{ fontSize: 22 }}>🎙</span>
           <span style={{ fontWeight: 700, fontSize: 18, color: "#f9fafb" }}>WhisperLinux</span>
         </div>
-        <button
-          onClick={() => (isRecording ? api.stopDictation() : api.startDictation())}
-          disabled={isBusy && !isRecording}
-          style={{
-            ...recordBtn,
-            background: isRecording ? "#ef4444" : "#3b82f6",
-          }}
-        >
-          {isRecording ? "Stop" : "Record"}
-        </button>
+
+        {isRecording ? (
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={pulsingDot} />
+            <span style={{ color: "#ef4444", fontWeight: 600, fontSize: 14 }}>Recording…</span>
+            <button
+              onClick={() => api.stopDictation()}
+              style={doneBtn}
+              title="Done — process speech"
+            >
+              ✓ Done
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={() => api.startDictation()}
+            disabled={isBusy}
+            style={{ ...recordBtn, opacity: isBusy ? 0.5 : 1, cursor: isBusy ? "default" : "pointer" }}
+          >
+            {isBusy ? "Processing…" : "● Record"}
+          </button>
+        )}
       </header>
 
       <div style={{ padding: "8px 24px 0" }}>
@@ -82,12 +94,29 @@ const main: React.CSSProperties = {
 };
 const recordBtn: React.CSSProperties = {
   border: "none",
+  background: "#3b82f6",
   color: "#fff",
   borderRadius: 6,
   padding: "8px 18px",
   fontWeight: 600,
   fontSize: 14,
+};
+const doneBtn: React.CSSProperties = {
+  border: "none",
+  background: "#10b981",
+  color: "#fff",
+  borderRadius: 6,
+  padding: "8px 20px",
+  fontWeight: 700,
+  fontSize: 15,
   cursor: "pointer",
+};
+const pulsingDot: React.CSSProperties = {
+  width: 12,
+  height: 12,
+  borderRadius: "50%",
+  background: "#ef4444",
+  animation: "pulse 1s infinite",
 };
 const tabBtn = (active: boolean): React.CSSProperties => ({
   background: "none",
