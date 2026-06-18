@@ -12,6 +12,6 @@ class XdotoolInjector(TextInjector):
         if not text:
             return
         subprocess.run(
-            ["xdotool", "type", "--clearmodifiers", "--", text],
+            ["xdotool", "type", "--clearmodifiers", "--delay", "0", "--", text],
             check=True,
         )
