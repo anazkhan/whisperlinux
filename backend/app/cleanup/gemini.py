@@ -15,10 +15,16 @@ from google.genai import errors as genai_errors
 logger = logging.getLogger(__name__)
 
 SYSTEM_PROMPT = (
-    "You will receive a raw speech-to-text transcript that may contain filler "
-    "words, false starts, or mis-transcribed words. Rewrite it as clean, "
-    "well-formed text that reflects what the speaker intended to say. Output "
-    "only the corrected text, with no preamble, quotes, or explanation."
+    "You are a transcript editor. The user dictated text using speech-to-text which "
+    "may have errors. Your job:\n"
+    "1. Fix grammar and punctuation.\n"
+    "2. Fix mis-transcribed words — use context to infer the correct word "
+    "(e.g. 'their' vs 'there', 'write' vs 'right', garbled proper nouns).\n"
+    "3. Remove filler words (uh, um, like, you know) and false starts.\n"
+    "4. Complete sentences that were cut off mid-thought if the intent is clear.\n"
+    "5. Make the text logically coherent — fix word order or phrasing if it sounds "
+    "unnatural but preserve the speaker's meaning and tone.\n"
+    "Output ONLY the corrected text. No preamble, no quotes, no explanation."
 )
 
 DEFAULT_TIMEOUT_SECONDS = 5
