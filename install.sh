@@ -124,6 +124,27 @@ info "Installing WhisperLinux backend..."
 "$VENV_PIP" install --quiet -e "$BACKEND_DIR"
 success "Backend installed"
 
+# ── 4b. Pre-download default STT model (base) ─────────────────────────────────
+header "Downloading STT model (faster-whisper base, ~145 MB)..."
+MODELS_DIR="$BACKEND_DIR/models"
+mkdir -p "$MODELS_DIR/base"
+WHISPER_MODELS_DIR="$MODELS_DIR" "$VENV_PYTHON" - <<'PYEOF'
+import sys, os
+from pathlib import Path
+models_dir = Path(os.environ["WHISPER_MODELS_DIR"])
+try:
+    from huggingface_hub import snapshot_download
+    snapshot_download(
+        repo_id="Systran/faster-whisper-base",
+        local_dir=str(models_dir / "base"),
+        ignore_patterns=["*.msgpack", "*.h5", "flax_model*", "tf_model*", "rust_model*"],
+    )
+    print("Model ready.")
+except Exception as e:
+    print(f"Warning: model pre-download failed ({e}). It will download on first run instead.")
+PYEOF
+success "STT model ready at $MODELS_DIR/base"
+
 # ── 5. Frontend build ──────────────────────────────────────────────────────────
 header "Building frontend..."
 cd "$FRONTEND_DIR"

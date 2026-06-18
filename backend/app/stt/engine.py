@@ -6,6 +6,8 @@ avoid paying model-load latency on every dictation.
 from __future__ import annotations
 
 import logging
+import os
+from pathlib import Path
 from typing import Literal
 
 import numpy as np
@@ -23,6 +25,25 @@ MODEL_CATALOG: dict[ModelSize, int] = {
     "large": 2900,
 }
 
+# Models pre-downloaded by install.sh live here so no HF network calls at runtime.
+_MODELS_DIR = Path(__file__).parent.parent.parent / "models"
+
+HF_REPO: dict[ModelSize, str] = {
+    "tiny": "Systran/faster-whisper-tiny",
+    "base": "Systran/faster-whisper-base",
+    "small": "Systran/faster-whisper-small",
+    "medium": "Systran/faster-whisper-medium",
+    "large": "Systran/faster-whisper-large-v3",
+}
+
+
+def _model_path(model_size: ModelSize) -> str:
+    """Return local path if pre-downloaded, else the HF model id (triggers download)."""
+    local = _MODELS_DIR / model_size
+    if local.exists() and any(local.iterdir()):
+        return str(local)
+    return HF_REPO[model_size]
+
 
 class SttEngine:
     """Thin wrapper around a warm faster-whisper model instance."""
@@ -36,8 +57,9 @@ class SttEngine:
     def load(self) -> None:
         compute_type = "int8" if self._device in ("auto", "cpu") else "float16"
         device = "cpu" if self._device == "auto" else self._device
-        logger.info("Loading faster-whisper model=%s device=%s", self._model_size, device)
-        self._model = WhisperModel(self._model_size, device=device, compute_type=compute_type)
+        path = _model_path(self._model_size)
+        logger.info("Loading faster-whisper model=%s device=%s source=%s", self._model_size, device, path)
+        self._model = WhisperModel(path, device=device, compute_type=compute_type, local_files_only=Path(path).is_absolute())
 
     def reload(self, model_size: ModelSize, device: str) -> None:
         if model_size == self._model_size and device == self._device:
