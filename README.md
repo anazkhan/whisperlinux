@@ -51,7 +51,7 @@ Then open **http://localhost:7777** in your browser and complete the one-time se
 1. Paste your **Gemini API key**
 2. Select your **microphone**
 3. Pick a **model size** — Base is a good default (fast, decent accuracy)
-4. Set your **hotkey** — default is `Ctrl+Alt+Space`
+4. Set your **hotkey** — default is `Ctrl+Q`
 5. Click **Save settings**
 
 That's it. From now on, press your hotkey in any app, speak, and the cleaned-up text is typed in for you.
