@@ -75,7 +75,6 @@ class SttEngine:
             audio,
             language=language,
             vad_filter=False,  # VAD is already applied upstream during capture
-            beam_size=1,
-            condition_on_previous_text=False,
+            beam_size=5,
         )
         return "".join(segment.text for segment in segments).strip()
