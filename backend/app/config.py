@@ -37,7 +37,7 @@ class Settings(BaseModel):
     stt_model: ModelSize = "base"
     stt_device: Literal["auto", "cpu", "cuda"] = "auto"
     language: str | None = None  # None => auto-detect
-    gemini_model: str = "gemini-1.5-flash"
+    gemini_model: str = "gemini-2.5-flash"
 
 
 def _ensure_config_dir() -> None:
